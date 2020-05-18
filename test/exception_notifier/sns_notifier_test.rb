@@ -10,9 +10,6 @@ class SnsNotifierTest < ActiveSupport::TestCase
     @exception.stubs(:backtrace).returns(fake_backtrace)
     @exception.stubs(:message).returns("undefined method 'method=' for Empty")
     @options = {
-      access_key_id: 'my-access_key_id',
-      secret_access_key: 'my-secret_access_key',
-      region: 'us-east',
       topic_arn: 'topicARN',
       sns_prefix: '[App Exception]'
     }
@@ -21,41 +18,10 @@ class SnsNotifierTest < ActiveSupport::TestCase
 
   # initialize
 
-  test 'should initialize aws notifier with received params' do
-    Aws::SNS::Client.expects(:new).with(
-      region: 'us-east',
-      access_key_id: 'my-access_key_id',
-      secret_access_key: 'my-secret_access_key'
-    )
+  test 'should initialize aws notifier with no params' do
+    Aws::SNS::Client.expects(:new).with()
 
     ExceptionNotifier::SnsNotifier.new(@options)
-  end
-
-  test 'should raise an exception if region is not received' do
-    @options[:region] = nil
-
-    error = assert_raises ArgumentError do
-      ExceptionNotifier::SnsNotifier.new(@options)
-    end
-    assert_equal "You must provide 'region' option", error.message
-  end
-
-  test 'should raise an exception on publish if access_key_id is not received' do
-    @options[:access_key_id] = nil
-    error = assert_raises ArgumentError do
-      ExceptionNotifier::SnsNotifier.new(@options)
-    end
-
-    assert_equal "You must provide 'access_key_id' option", error.message
-  end
-
-  test 'should raise an exception on publish if secret_access_key is not received' do
-    @options[:secret_access_key] = nil
-    error = assert_raises ArgumentError do
-      ExceptionNotifier::SnsNotifier.new(@options)
-    end
-
-    assert_equal "You must provide 'secret_access_key' option", error.message
   end
 
   # call
